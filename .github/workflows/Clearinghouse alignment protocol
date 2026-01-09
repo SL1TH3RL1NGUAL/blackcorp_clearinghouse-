@@ -1,0 +1,26 @@
+name: Clearinghouse Alignment Protocol
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *' # hourly sync
+
+jobs:
+  align_schedule:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Load Schedule Config
+      run: |
+        echo "Loading mesh schedule alignment..."
+        echo "Primary: mesh/schedule/primary"
+        echo "Secondary: mesh/schedule/secondary"
+
+    - name: Adjust Applications
+      run: |
+        echo "Adjusting CRM and Dispatch modes..."
+        cat apps-adjust.json
+
+    - name: Activate Second Business Line
+      run: |
+        echo "Triggering secondary chamber..."
+        echo "Endpoint: sim://endpoint/business_line_2"
