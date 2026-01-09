@@ -1,0 +1,71 @@
+name: Agent Pilot – Map Router Chamber
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  agent_pilot:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Initialize Side‑Unit
+      id: sideunit
+      run: |
+        echo "status=activated" >> $GITHUB_OUTPUT
+        echo "bridge=bidirectional" >> $GITHUB_OUTPUT
+        echo "geofence=simulation-only" >> $GITHUB_OUTPUT
+
+    - name: Define Symbolic Endpoints
+      id: endpoints
+      run: |
+        cat <<EOF > endpoints.json
+        {
+          "intelligence_state_side": "sim://endpoint/intel",
+          "international_trade_courts": "sim://endpoint/itc",
+          "houston_gang_intel": "sim://endpoint/hgi",
+          "chambers_of_commerce": "sim://endpoint/coc",
+          "secretary_of_state": "sim://endpoint/sos",
+          "federal_trade_commission": "sim://endpoint/ftc",
+          "secret_service": "sim://endpoint/ss",
+          "governor_abbott": "sim://endpoint/ga",
+          "inger_hampton_chandler": "sim://endpoint/ihc",
+          "a_mobile_bail_bonds": "sim://endpoint/ambb",
+          "glenda_tanner": "sim://endpoint/gt",
+          "sandra_de_hoyos": "sim://endpoint/sdh",
+          "esteban_tamayo": "sim://endpoint/et",
+          "brittany_isdarely_rodriguez": "sim://endpoint/bir",
+          "wheelhouse_aa": "sim://endpoint/wh-aa",
+          "south_houston_masonic_lodge": "sim://endpoint/shml",
+          "the_satanic_temple": "sim://endpoint/tst",
+          "public_dps": "sim://endpoint/pdps",
+          "congress_gov": "sim://endpoint/cg",
+          "lgtq": "sim://endpoint/lgtq",
+          "ice_border_patrol": "sim://endpoint/icebp"
+        }
+        EOF
+
+    - name: Bind Chamber Link
+      id: chamberlink
+      run: |
+        echo "chamber=https://blackcorp.me/badmotherchamber" >> $GITHUB_OUTPUT
+
+    - name: Render Insight Bridge
+      id: bridge
+      run: |
+        echo "Rendering bidirectional insight stream..."
+        echo "Side-unit: ${{ steps.sideunit.outputs.status }}"
+        echo "Bridge: ${{ steps.sideunit.outputs.bridge }}"
+        echo "Geofence Mode: ${{ steps.sideunit.outputs.geofence }}"
+        echo "Chamber Link: ${{ steps.chamberlink.outputs.chamber }}"
+
+    - name: Archive Ritual Output
+      uses: actions/upload-artifact@v4
+      with:
+        name: agent-pilot-map-router
+        path: |
+          endpoints.json
