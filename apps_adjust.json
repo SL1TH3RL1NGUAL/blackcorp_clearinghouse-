@@ -1,0 +1,10 @@
+{
+  "crm": {
+    "mode": "dual-line",
+    "active_hours": "08:00-16:00"
+  },
+  "dispatch": {
+    "mode": "secondary-only",
+    "active_hours": "16:00-22:00"
+  }
+}
