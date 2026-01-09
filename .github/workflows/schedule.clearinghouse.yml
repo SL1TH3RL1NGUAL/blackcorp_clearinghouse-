@@ -1,0 +1,49 @@
+name: Schedule Clearinghouse Sync
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *' # every 30 minutes
+
+env:
+  LINE1_SCHEDULE: "08:00-16:00"
+  LINE2_SCHEDULE: "16:00-22:00"
+  LINE2_ENABLED: "true"
+
+jobs:
+  sync_schedule:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Load Schedule Config
+      run: |
+        echo "Primary Line Schedule: $LINE1_SCHEDULE"
+        echo "Secondary Line Schedule: $LINE2_SCHEDULE"
+        echo "Secondary Line Enabled: $LINE2_ENABLED"
+
+    - name: Adjust Application Modes
+      run: |
+        cat <<EOF > apps-adjust.json
+        {
+          "crm": {
+            "mode": "dual-line",
+            "active_hours": "$LINE1_SCHEDULE"
+          },
+          "dispatch": {
+            "mode": "secondary-only",
+            "active_hours": "$LINE2_SCHEDULE"
+          }
+        }
+        EOF
+        echo "Application config written to apps-adjust.json"
+
+    - name: Trigger Secondary Line
+      if: env.LINE2_ENABLED == 'true'
+      run: |
+        echo "Activating secondary business line..."
+        curl -X POST https://blackcorp.me/badmotherchamber \
+          -H "Content-Type: application/json" \
+          -d '{"trigger":"line2-activate","timestamp":"$(date -u +%Y-%m-%dT%H:%M:%SZ)"}'
